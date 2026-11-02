@@ -1,0 +1,51 @@
+# Copyright 2026 MSPbots.ai
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Billing contracts (read-only in v1; see Non-goals in docs/tickets/PRD-21211.md)."""
+
+from typing import Annotated, Any
+
+from mcp.server.fastmcp import FastMCP
+from pydantic import Field
+
+from ..api_client import GoreloClient
+from ._common import READ_ONLY, ClientFactory, Cursor, Limit, compact, data, page_cursor, paging, run_tool
+
+ContractId = Annotated[int, Field(description="Gorelo contract id.", ge=1)]
+
+
+def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
+    @mcp.tool(annotations=READ_ONLY)
+    async def gorelo_list_contracts(
+        query: Annotated[str | None, Field(description="Text to search for in contract name/reference.")] = None,
+        limit: Limit = 50,
+        cursor: Cursor = None,
+        client_ids: Annotated[str | None, Field(description="Comma-separated client ids.")] = None,
+        status_ids: Annotated[str | None, Field(description="Comma-separated status ids; Gorelo has no status-name lookup for contracts.")] = None,
+    ) -> str:
+        """List billing contracts: id, name, status, client, start/end date, recurring amount."""
+
+        async def action(client: GoreloClient) -> dict:
+            params = paging(limit, cursor) | compact({"Query": query, "ClientIds": client_ids, "StatusIds": status_ids})
+            return page_cursor(await client.get("v1/contracts", params), "contracts")
+
+        return await run_tool("gorelo_list_contracts", client_factory, action)
+
+    @mcp.tool(annotations=READ_ONLY)
+    async def gorelo_get_contract(contract_id: ContractId) -> str:
+        """Get one contract's full record: name, status, client, locations, dates, service lines."""
+
+        async def action(client: GoreloClient) -> Any:
+            return data(await client.get(f"v1/contracts/{contract_id}"))
+
+        return await run_tool("gorelo_get_contract", client_factory, action)
