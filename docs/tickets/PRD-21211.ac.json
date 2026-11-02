@@ -4,147 +4,234 @@
     "ac": "AC1",
     "text": "Given valid Gorelo credentials and no filters, when gorelo_list_tickets is called, then it returns up to limit (default 50, max 200) tickets with the required fields and the {items, has_more, next_cursor, total_count} envelope.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_tickets_no_filters_returns_envelope"
+    ],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_api_client.py::test_list_tickets_no_filters_returns_envelope -> PASSED (2026-11-02, dev/PRD-21211@33f0ad9)"
   },
   {
     "id": "TC-GORELO-002",
     "ac": "AC2",
     "text": "Given gorelo_list_tickets(status_names=\"NoSuchStatus\"), when the name does not resolve against gorelo_list_ticket_statuses, then it returns invalid_argument naming the known status values, without calling the Gorelo tickets endpoint.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_tickets_unknown_status_name_errors_without_calling_tickets_endpoint"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_tickets_unknown_status_name_errors_without_calling_tickets_endpoint -> PASSED; asserts invalid_argument naming New/In Progress and zero calls to GET v1/tickets"
   },
   {
     "id": "TC-GORELO-003",
     "ac": "AC2",
     "text": "Given gorelo_list_tickets(priority_names=\"urgent,bogus\"), when one name is not one of the five fixed priority levels, then it returns invalid_argument naming the five valid priority names.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_tickets_unknown_priority_name_names_the_five_values"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_tickets_unknown_priority_name_names_the_five_values -> PASSED; asserts all 5 priority names present in the message"
   },
   {
     "id": "TC-GORELO-004",
     "ac": "AC3",
     "text": "Given a valid ticket id, when gorelo_get_ticket is called, then it returns the full ticket record (title, description, status, priority, type, source, client/contact/location, assignees, tags, linked assets, timestamps).",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_get_ticket_unwraps_data"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_get_ticket_unwraps_data -> PASSED"
   },
   {
     "id": "TC-GORELO-005",
     "ac": "AC4",
     "text": "Given an unknown id, when gorelo_get_ticket, gorelo_get_client, gorelo_get_contact, gorelo_get_contract, or gorelo_get_agent_asset is called, then each returns a not_found error envelope, never an uncaught exception.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_get_unknown_id_returns_not_found"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_get_unknown_id_returns_not_found (5 parametrized cases: ticket/client/contact/contract/agent_asset) -> 5 PASSED"
   },
   {
     "id": "TC-GORELO-006",
     "ac": "AC5",
     "text": "Given a valid ticket id and a comment body with no conversation_id, when gorelo_add_ticket_comment is called, then the comment is posted to the ticket's Public conversation and the tool returns the created comment's id.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_add_comment_defaults_to_public"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_add_comment_defaults_to_public -> PASSED; asserts ConversationTypeId=1, no ConversationId sent, id returned"
   },
   {
     "id": "TC-GORELO-007",
     "ac": "AC5",
     "text": "Given a valid ticket id, a comment body, and a conversation_id from a prior side-conversation, when gorelo_add_ticket_comment is called, then the comment is posted into that conversation instead of the main thread.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_add_comment_with_conversation_id_targets_side_conversation"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_add_comment_with_conversation_id_targets_side_conversation -> PASSED"
   },
   {
     "id": "TC-GORELO-008",
     "ac": "AC6",
     "text": "Given title, client_id, status_name_or_id, type_name_or_id, and group_id, when gorelo_create_ticket is called, then a ticket is created and the tool returns its id and display number.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_create_ticket_required_fields"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_create_ticket_required_fields -> PASSED; asserts POST body and {id, display_number} result"
   },
   {
     "id": "TC-GORELO-009",
     "ac": "AC6",
     "text": "Given gorelo_create_ticket is called missing title, status, type, or group_id (each tried separately), then it returns invalid_argument naming the missing field, without calling the Gorelo create-ticket endpoint.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_create_ticket_missing_required_field_errors_without_calling_gorelo"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_create_ticket_missing_required_field_errors_without_calling_gorelo -> PASSED (5 required fields each tried missing); zero POST calls"
   },
   {
     "id": "TC-GORELO-010",
     "ac": "AC7",
     "text": "Given no filters, when gorelo_list_clients, gorelo_list_contacts, and gorelo_list_contracts are each called, then each returns up to limit records with the {items, has_more, next_cursor, total_count} envelope.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_clients_contacts_contracts_no_filters"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_clients_contacts_contracts_no_filters -> PASSED"
   },
   {
     "id": "TC-GORELO-011",
     "ac": "AC7",
     "text": "Given gorelo_list_clients(query=\"<a unique client name>\"), when there is exactly one matching client, then only that client is returned.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_clients_query_filters"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_clients_query_filters -> PASSED; asserts Query param forwarded"
   },
   {
     "id": "TC-GORELO-012",
     "ac": "AC8",
     "text": "Given gorelo_list_time_entries(ticket_ids=\"<id>\"), when there are time entries logged against other tickets too, then only entries logged against the given ticket are returned, paged the same way as AC1.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_time_entries_filtered_by_ticket"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_time_entries_filtered_by_ticket -> PASSED"
   },
   {
     "id": "TC-GORELO-013",
     "ac": "AC9",
     "text": "Given a valid ticket id, started_on, and actual_hours, when gorelo_log_time_entry is called, then a time entry is created against that ticket and the tool returns its id.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_log_time_entry_with_actual_hours"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_log_time_entry_with_actual_hours -> PASSED"
   },
   {
     "id": "TC-GORELO-014",
     "ac": "AC9",
     "text": "Given gorelo_log_time_entry is called with neither ended_on nor actual_hours, and separately with both, then each call returns invalid_argument without calling the Gorelo time-entries endpoint.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_log_time_entry_requires_exactly_one_duration"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_log_time_entry_requires_exactly_one_duration -> 2 PASSED (neither given; both given)"
   },
   {
     "id": "TC-GORELO-015",
     "ac": "AC10",
     "text": "Given no filters, when gorelo_list_agent_assets is called, then it returns up to limit devices with the required fields; given a valid agent_asset_id, gorelo_get_agent_asset returns the full device record.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_and_get_agent_assets"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_and_get_agent_assets -> PASSED"
   },
   {
     "id": "TC-GORELO-016",
     "ac": "AC11",
     "text": "Given a request to /mcp missing X-Gorelo-Api-Key and/or X-Gorelo-Region, when any tool is called, then the response is 401 naming the missing header(s), for every tool in the Tools table.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_middleware.py::test_missing_headers_return_401"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_missing_headers_return_401 -> 4 PASSED (parametrized); also confirmed live over HTTP: curl POST /mcp with no headers -> 401 (2026-11-02, local server on :8099)"
   },
   {
     "id": "TC-GORELO-017",
     "ac": "AC12",
     "text": "Given Gorelo returns HTTP 400, 401, 403, 404, 409, 429, or a 5xx/network error (one case per status), when any tool call hits that response, then the error envelope carries the correct code/retryable per the mapping table, with Gorelo's own Message and 6-digit Code preserved in the message text.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_tools.py::test_error_envelope"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_error_envelope -> 8 PASSED (400/401/403/404/409/429/5xx/network mapped to the table)"
   },
   {
     "id": "TC-GORELO-018",
     "ac": "AC12",
     "text": "Given Gorelo responds with HTTP 200, IsSuccess: false, and a non-empty Notifications array, when a tool parses that response, then it is treated as an error using the same mapping table, not as a successful empty result.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_is_success_false_on_200_is_an_error"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_is_success_false_on_200_is_an_error -> PASSED"
   },
   {
     "id": "TC-GORELO-019",
     "ac": "AC13",
     "text": "Given the server is running, when tools/list is called, then it returns exactly the 17 tools in the Data & API contract table, each with a description <=500 chars (first line <=100 chars) and the correct readOnlyHint/destructiveHint.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_tools.py::test_tool_names_are_stable",
+      "tests/test_tools.py::test_required_params",
+      "tests/test_tools.py::test_description_budget",
+      "tests/test_tools.py::test_annotations_match_side_effects"
+    ],
+    "result": "pass",
+    "evidence": "pytest tests/test_tools.py -> 60 PASSED; also confirmed live: curl tools/list over HTTP with placeholder creds returns all 17 tools (2026-11-02, local server on :8099)"
   },
   {
     "id": "TC-GORELO-020",
     "ac": "AC1",
     "text": "Given a list tool (gorelo_list_tickets / _clients / _contacts / _contracts / _time_entries / _agent_assets) returns has_more: true and a next_cursor, when the same tool is called again with cursor=<next_cursor>, then it returns the next page of records, not a repeat of the first page.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_api_client.py::test_list_tickets_cursor_round_trip"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_list_tickets_cursor_round_trip -> PASSED; page 2 request carries Cursor=page-2-token from page 1's next_cursor"
   },
   {
     "id": "TC-GORELO-021",
     "ac": "AC11",
     "text": "Given two interleaved fake requests carrying different X-Gorelo-Api-Key/X-Gorelo-Region values, when both are processed concurrently, then neither request's outgoing Gorelo call ever carries the other request's credentials or base host.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "tests/test_middleware.py::test_concurrent_requests_do_not_share_credentials"
+    ],
+    "result": "pass",
+    "evidence": "pytest ...::test_concurrent_requests_do_not_share_credentials -> PASSED"
   },
   {
     "id": "TC-GORELO-022",
@@ -160,13 +247,17 @@
     ],
     "expect": "tools/list lists all 17 tools; gorelo_list_tickets returns a 200-shaped {items,...} result with the documented fields present and correctly typed; gorelo_create_ticket creates a real ticket visible in the Gorelo web UI with the same title/client, and returns that ticket's real id and display number.",
     "result": "untested",
-    "notes": "Not required before shipping (no test account is not a blocker per vendor-mcp-development SOP 'no vendor test account is not a blocker'). Recorded here so the dev leg files it as an explicit outstanding item rather than silently skipping it; closes the 'schema drift' risk noted in Risks & dependencies."
+    "notes": "Not required before shipping (no test account is not a blocker per vendor-mcp-development SOP 'no vendor test account is not a blocker'). Partial evidence collected instead: live tools/call against the real Gorelo API (api.usw.gorelo.io) with a placeholder X-Gorelo-Api-Key returned a clean {\"error\":{\"code\":\"unauthorized\",...}} envelope end-to-end (2026-11-02), proving the real network path, region host and error mapping work; the real-account field-name verification itself remains outstanding. Closes the 'schema drift' risk noted in Risks & dependencies only partially."
   },
   {
     "id": "TC-GORELO-023",
     "ac": "non-functional",
     "text": "Given the repository at delivery time, when README.md's MSPbots Connector section is diffed against reference/readme-connector-section.md and the repo is scanned for CJK characters, then the section is verbatim-identical and no Chinese characters are found outside .git/.venv.",
     "type": "auto",
-    "tests": []
+    "tests": [
+      "manual diff + grep"
+    ],
+    "result": "pass",
+    "evidence": "README.md MSPbots Connector section verified byte-identical to reference/readme-connector-section.md via Python substring match (2026-11-02); grep -rnP '[\\x{4e00}-\\x{9fff}]' --exclude-dir=.git --exclude-dir=.venv . -> no output after translating 2 Chinese SOP-citation fragments in docs/tickets/PRD-21211.md to English glosses (see Self-test section)"
   }
 ]
