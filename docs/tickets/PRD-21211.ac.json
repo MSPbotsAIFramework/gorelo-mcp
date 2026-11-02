@@ -1,0 +1,172 @@
+[
+  {
+    "id": "TC-GORELO-001",
+    "ac": "AC1",
+    "text": "Given valid Gorelo credentials and no filters, when gorelo_list_tickets is called, then it returns up to limit (default 50, max 200) tickets with the required fields and the {items, has_more, next_cursor, total_count} envelope.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-002",
+    "ac": "AC2",
+    "text": "Given gorelo_list_tickets(status_names=\"NoSuchStatus\"), when the name does not resolve against gorelo_list_ticket_statuses, then it returns invalid_argument naming the known status values, without calling the Gorelo tickets endpoint.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-003",
+    "ac": "AC2",
+    "text": "Given gorelo_list_tickets(priority_names=\"urgent,bogus\"), when one name is not one of the five fixed priority levels, then it returns invalid_argument naming the five valid priority names.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-004",
+    "ac": "AC3",
+    "text": "Given a valid ticket id, when gorelo_get_ticket is called, then it returns the full ticket record (title, description, status, priority, type, source, client/contact/location, assignees, tags, linked assets, timestamps).",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-005",
+    "ac": "AC4",
+    "text": "Given an unknown id, when gorelo_get_ticket, gorelo_get_client, gorelo_get_contact, gorelo_get_contract, or gorelo_get_agent_asset is called, then each returns a not_found error envelope, never an uncaught exception.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-006",
+    "ac": "AC5",
+    "text": "Given a valid ticket id and a comment body with no conversation_id, when gorelo_add_ticket_comment is called, then the comment is posted to the ticket's Public conversation and the tool returns the created comment's id.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-007",
+    "ac": "AC5",
+    "text": "Given a valid ticket id, a comment body, and a conversation_id from a prior side-conversation, when gorelo_add_ticket_comment is called, then the comment is posted into that conversation instead of the main thread.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-008",
+    "ac": "AC6",
+    "text": "Given title, client_id, status_name_or_id, type_name_or_id, and group_id, when gorelo_create_ticket is called, then a ticket is created and the tool returns its id and display number.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-009",
+    "ac": "AC6",
+    "text": "Given gorelo_create_ticket is called missing title, status, type, or group_id (each tried separately), then it returns invalid_argument naming the missing field, without calling the Gorelo create-ticket endpoint.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-010",
+    "ac": "AC7",
+    "text": "Given no filters, when gorelo_list_clients, gorelo_list_contacts, and gorelo_list_contracts are each called, then each returns up to limit records with the {items, has_more, next_cursor, total_count} envelope.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-011",
+    "ac": "AC7",
+    "text": "Given gorelo_list_clients(query=\"<a unique client name>\"), when there is exactly one matching client, then only that client is returned.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-012",
+    "ac": "AC8",
+    "text": "Given gorelo_list_time_entries(ticket_ids=\"<id>\"), when there are time entries logged against other tickets too, then only entries logged against the given ticket are returned, paged the same way as AC1.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-013",
+    "ac": "AC9",
+    "text": "Given a valid ticket id, started_on, and actual_hours, when gorelo_log_time_entry is called, then a time entry is created against that ticket and the tool returns its id.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-014",
+    "ac": "AC9",
+    "text": "Given gorelo_log_time_entry is called with neither ended_on nor actual_hours, and separately with both, then each call returns invalid_argument without calling the Gorelo time-entries endpoint.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-015",
+    "ac": "AC10",
+    "text": "Given no filters, when gorelo_list_agent_assets is called, then it returns up to limit devices with the required fields; given a valid agent_asset_id, gorelo_get_agent_asset returns the full device record.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-016",
+    "ac": "AC11",
+    "text": "Given a request to /mcp missing X-Gorelo-Api-Key and/or X-Gorelo-Region, when any tool is called, then the response is 401 naming the missing header(s), for every tool in the Tools table.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-017",
+    "ac": "AC12",
+    "text": "Given Gorelo returns HTTP 400, 401, 403, 404, 409, 429, or a 5xx/network error (one case per status), when any tool call hits that response, then the error envelope carries the correct code/retryable per the mapping table, with Gorelo's own Message and 6-digit Code preserved in the message text.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-018",
+    "ac": "AC12",
+    "text": "Given Gorelo responds with HTTP 200, IsSuccess: false, and a non-empty Notifications array, when a tool parses that response, then it is treated as an error using the same mapping table, not as a successful empty result.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-019",
+    "ac": "AC13",
+    "text": "Given the server is running, when tools/list is called, then it returns exactly the 17 tools in the Data & API contract table, each with a description <=500 chars (first line <=100 chars) and the correct readOnlyHint/destructiveHint.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-020",
+    "ac": "AC1",
+    "text": "Given a list tool (gorelo_list_tickets / _clients / _contacts / _contracts / _time_entries / _agent_assets) returns has_more: true and a next_cursor, when the same tool is called again with cursor=<next_cursor>, then it returns the next page of records, not a repeat of the first page.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-021",
+    "ac": "AC11",
+    "text": "Given two interleaved fake requests carrying different X-Gorelo-Api-Key/X-Gorelo-Region values, when both are processed concurrently, then neither request's outgoing Gorelo call ever carries the other request's credentials or base host.",
+    "type": "auto",
+    "tests": []
+  },
+  {
+    "id": "TC-GORELO-022",
+    "ac": "AC1, AC6",
+    "text": "Given a real Gorelo trial/sandbox account, when initialize -> tools/list -> tools/call is run for gorelo_list_tickets and gorelo_create_ticket, then both succeed end-to-end and the field names returned match what this design assumed from the fetched OpenAPI schema.",
+    "type": "manual",
+    "steps": [
+      "Obtain a real Gorelo API key and region for a trial/sandbox service provider (Settings -> Integrations -> Generate New Key)",
+      "Start the server locally with that key/region in X-Gorelo-Api-Key / X-Gorelo-Region",
+      "Call initialize, then tools/list, confirm all 17 tools are listed",
+      "Call gorelo_list_tickets with no filters; inspect the returned fields against the Data & API contract table",
+      "Call gorelo_create_ticket with a minimal valid payload; confirm a ticket is created in the Gorelo UI and the tool's returned id/display number match it"
+    ],
+    "expect": "tools/list lists all 17 tools; gorelo_list_tickets returns a 200-shaped {items,...} result with the documented fields present and correctly typed; gorelo_create_ticket creates a real ticket visible in the Gorelo web UI with the same title/client, and returns that ticket's real id and display number.",
+    "result": "untested",
+    "notes": "Not required before shipping (no test account is not a blocker per vendor-mcp-development SOP 'no vendor test account is not a blocker'). Recorded here so the dev leg files it as an explicit outstanding item rather than silently skipping it; closes the 'schema drift' risk noted in Risks & dependencies."
+  },
+  {
+    "id": "TC-GORELO-023",
+    "ac": "non-functional",
+    "text": "Given the repository at delivery time, when README.md's MSPbots Connector section is diffed against reference/readme-connector-section.md and the repo is scanned for CJK characters, then the section is verbatim-identical and no Chinese characters are found outside .git/.venv.",
+    "type": "auto",
+    "tests": []
+  }
+]
